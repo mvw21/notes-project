@@ -2,22 +2,19 @@ version: '3.8'
 
 services:
   mysql:
-    image: mysql:8.0.39
+    image: mysql:8.0
     container_name: mysql-container
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: notes_db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: userpassword
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: notesdb
+      MYSQL_USER: notes_user
+      MYSQL_PASSWORD: notes_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - notes-network
     ports:
       - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   backend:
     build: .
@@ -25,20 +22,18 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/notes_db
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: userpassword
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/notesdb
+      SPRING_DATASOURCE_USERNAME: notes_user
+      SPRING_DATASOURCE_PASSWORD: notes_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
-      mysql:
-        condition: service_healthy
-
-  frontend:
-    build: /home/martin/VisualStudioProjects/notes-app  # Adjust the path to your frontend app
-    container_name: notes-frontend
-    ports:
-      - "3000:3000"  # Assuming your frontend runs on port 3000
-    environment:
-      - NODE_ENV=development  # Or production, depending on your environment
+      - mysql
+    networks:
+      - notes-network
 
 volumes:
-  mysql_data:
+  mysql-data:
+
+networks:
+  notes-network:
+    driver: bridge
