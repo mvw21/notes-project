@@ -12,7 +12,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Use a minimal JDK image to run the application
-FROM openjdk:17-jdk-alpine
+FROM openjdk:17-jdk-alpine3.14
 
 # Set the working directory in the container
 WORKDIR /app

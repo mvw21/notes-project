@@ -10,6 +10,7 @@ public class NoteEntity {
     private String title;
     @Lob
     @Column(columnDefinition = "MEDIUMTEXT")
+//    @Column(columnDefinition = "TEXT")
     private String content;
     @Enumerated(EnumType.STRING)
     private NoteType type;
